@@ -1,4 +1,4 @@
-import { BottomTab } from "./bottom-tab";
+import { BottomTabBar } from "./bottom-tab-bar";
 
 export function MobileShell({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +12,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
             {children}
           </div>
         </div>
-        <BottomTab />
+        <BottomTabBar />
       </div>
     </div>
   );

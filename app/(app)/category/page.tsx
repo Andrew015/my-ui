@@ -1,29 +1,29 @@
+import Link from "next/link";
+import { PageHeader } from "@/components/page-header";
+
 export default function CategoryPage() {
   const channels = [
-    "数码家电",
-    "家居日用",
-    "图书文娱",
-    "母婴儿童",
-    "服饰鞋包",
-    "运动户外",
+    { name: "淘闲置", href: "/idle" },
+    { name: "短租用", href: "/rent" },
+    { name: "来置换", href: "/swap" },
+    { name: "邻里公益", href: "/community" },
+    { name: "免费赠送", href: "/community/give" },
+    { name: "互助服务", href: "/community/help" },
   ];
 
   return (
-    <div className="px-4 pt-2 pb-4">
-      <header className="py-4">
-        <h1 className="text-xl font-semibold text-stone-800">分类 / 频道</h1>
-        <p className="mt-1 text-sm text-stone-500">按品类浏览闲置与短租</p>
-      </header>
+    <div>
+      <PageHeader title="分类" subtitle="快速进入不同频道" />
 
-      <div className="grid grid-cols-2 gap-3">
-        {channels.map((name) => (
-          <button
-            key={name}
-            type="button"
+      <div className="grid grid-cols-2 gap-3 px-4 py-4">
+        {channels.map((row) => (
+          <Link
+            key={row.href}
+            href={row.href}
             className="rounded-2xl bg-white py-6 text-center text-sm font-medium text-stone-700 shadow-sm ring-1 ring-stone-200/80 transition hover:bg-stone-50"
           >
-            {name}
-          </button>
+            {row.name}
+          </Link>
         ))}
       </div>
     </div>

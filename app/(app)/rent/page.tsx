@@ -3,24 +3,24 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/page-header";
-import { idleCategories, type IdleCategory, getItemsByChannel } from "@/data/mock";
+import { getItemsByChannel, rentCategories, type RentCategory } from "@/data/mock";
 
 type SortKey = "综合" | "最新" | "距离最近" | "价格";
 
 const sortOptions: SortKey[] = ["综合", "最新", "距离最近", "价格"];
 
-export default function IdlePage() {
-  const allIdleItems = getItemsByChannel("idle");
+export default function RentPage() {
+  const allRentItems = getItemsByChannel("rent");
   const [keyword, setKeyword] = useState("");
-  const [activeCategory, setActiveCategory] = useState<IdleCategory>("推荐");
+  const [activeCategory, setActiveCategory] = useState<RentCategory>("推荐");
   const [activeSort, setActiveSort] = useState<SortKey>("综合");
   const [priceOrder, setPriceOrder] = useState<"asc" | "desc">("asc");
 
   const list = useMemo(() => {
     const byCategory =
       activeCategory === "推荐"
-        ? allIdleItems
-        : allIdleItems.filter((item) => item.category === activeCategory);
+        ? allRentItems
+        : allRentItems.filter((item) => item.category === activeCategory);
 
     const search = keyword.trim().toLowerCase();
     const filtered = !search
@@ -37,7 +37,10 @@ export default function IdlePage() {
           new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime(),
       );
     } else if (activeSort === "距离最近") {
-      sorted.sort((a, b) => (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER));
+      sorted.sort(
+        (a, b) =>
+          (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER),
+      );
     } else if (activeSort === "价格") {
       sorted.sort((a, b) =>
         priceOrder === "asc"
@@ -47,24 +50,24 @@ export default function IdlePage() {
     }
 
     return sorted;
-  }, [activeCategory, activeSort, allIdleItems, keyword, priceOrder]);
+  }, [activeCategory, activeSort, allRentItems, keyword, priceOrder]);
 
   return (
     <div>
-      <PageHeader title="淘闲置" backHref="/" subtitle="像电商一样逛社区闲置" />
+      <PageHeader title="短租用" backHref="/" subtitle="短期借用更划算" />
       <div className="px-4 py-4">
         <div className="rounded-2xl bg-white px-3 py-2.5 shadow-sm ring-1 ring-stone-200/80">
           <input
             value={keyword}
             onChange={(event) => setKeyword(event.target.value)}
-            placeholder="搜索闲置商品"
+            placeholder="搜索可租用物品"
             className="w-full bg-transparent text-sm text-stone-700 placeholder:text-stone-400 outline-none"
-            aria-label="搜索闲置商品"
+            aria-label="搜索可租用物品"
           />
         </div>
 
         <div className="mt-3 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-          {idleCategories.map((category) => {
+          {rentCategories.map((category) => {
             const active = category === activeCategory;
             return (
               <button
@@ -73,7 +76,7 @@ export default function IdlePage() {
                 onClick={() => setActiveCategory(category)}
                 className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition ${
                   active
-                    ? "bg-teal-600 text-white"
+                    ? "bg-sky-600 text-white"
                     : "bg-white text-stone-600 ring-1 ring-stone-200"
                 }`}
               >
@@ -85,37 +88,37 @@ export default function IdlePage() {
 
         <div className="mt-2 rounded-xl bg-white ring-1 ring-stone-200/80">
           <div className="grid grid-cols-4 p-1">
-          {sortOptions.map((label) => {
-            const active = label === activeSort;
-            return (
-              <button
-                key={label}
-                type="button"
-                onClick={() => {
-                  if (label === "价格") {
-                    if (activeSort === "价格") {
-                      setPriceOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-                    } else {
-                      setActiveSort("价格");
-                      setPriceOrder("asc");
+            {sortOptions.map((label) => {
+              const active = label === activeSort;
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    if (label === "价格") {
+                      if (activeSort === "价格") {
+                        setPriceOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+                      } else {
+                        setActiveSort("价格");
+                        setPriceOrder("asc");
+                      }
+                      return;
                     }
-                    return;
-                  }
-                  setActiveSort(label);
-                }}
-                className={`rounded-lg px-1 py-1.5 text-xs font-medium transition ${
-                  active ? "bg-teal-50 text-teal-700" : "text-stone-500"
-                }`}
-              >
-                {label}
-                {label === "价格" && activeSort === "价格"
-                  ? priceOrder === "asc"
-                    ? " ↑"
-                    : " ↓"
-                  : ""}
-              </button>
-            );
-          })}
+                    setActiveSort(label);
+                  }}
+                  className={`rounded-lg px-1 py-1.5 text-xs font-medium transition ${
+                    active ? "bg-sky-50 text-sky-700" : "text-stone-500"
+                  }`}
+                >
+                  {label}
+                  {label === "价格" && activeSort === "价格"
+                    ? priceOrder === "asc"
+                      ? " ↑"
+                      : " ↓"
+                    : ""}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -135,7 +138,7 @@ export default function IdlePage() {
                 <h3 className="line-clamp-2 text-sm font-medium leading-5 text-stone-800">
                   {item.title}
                 </h3>
-                <p className="mt-1 text-base font-semibold text-rose-600">
+                <p className="mt-1 text-base font-semibold text-sky-700">
                   {item.priceLabel}
                 </p>
                 <div className="mt-1 flex items-center justify-between gap-2">
@@ -151,7 +154,7 @@ export default function IdlePage() {
         </div>
         {!list.length ? (
           <div className="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white/70 py-8 text-center text-sm text-stone-500">
-            暂无匹配商品，换个关键词试试
+            暂无匹配租赁信息，换个关键词试试
           </div>
         ) : null}
       </div>

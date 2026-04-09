@@ -3,11 +3,13 @@ import Link from "next/link";
 type PageHeaderProps = {
   title: string;
   backHref?: string;
+  subtitle?: string;
 };
 
-export function PageHeader({ title, backHref }: PageHeaderProps) {
+export function PageHeader({ title, backHref, subtitle }: PageHeaderProps) {
   return (
-    <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-stone-200/80 bg-[#f4f7f4]/95 px-4 py-3 backdrop-blur-md">
+    <header className="sticky top-0 z-10 border-b border-stone-200/80 bg-[#f4f7f4]/95 px-4 py-3 backdrop-blur-md">
+      <div className="flex items-center gap-3">
       {backHref ? (
         <Link
           href={backHref}
@@ -32,6 +34,8 @@ export function PageHeader({ title, backHref }: PageHeaderProps) {
         {title}
       </h1>
       <span className="w-9 shrink-0" aria-hidden />
+      </div>
+      {subtitle ? <p className="mt-1 text-center text-xs text-stone-500">{subtitle}</p> : null}
     </header>
   );
 }
