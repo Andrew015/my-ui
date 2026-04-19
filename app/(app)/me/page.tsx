@@ -13,7 +13,7 @@ export default function MePage() {
     <div>
       <PageHeader title="我的" subtitle="个人中心原型" />
       <header className="flex items-center gap-4 px-4 py-5">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-emerald-600 text-xl font-semibold text-white shadow-md">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand to-orange-700 text-xl font-semibold text-brand-foreground shadow-md">
           邻
         </div>
         <div>
@@ -22,7 +22,7 @@ export default function MePage() {
         </div>
       </header>
 
-      <nav className="mx-4 overflow-hidden rounded-2xl bg-white ring-1 ring-stone-200/80">
+      <nav className="mx-4 overflow-hidden rounded-2xl bg-white ring-1 ring-orange-100/90">
         {rows.map((row) => (
           <Link
             key={row.label}

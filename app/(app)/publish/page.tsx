@@ -12,14 +12,14 @@ export default function PublishPage() {
           <Link
             key={type.key}
             href={type.href}
-            className="block rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200/80 transition hover:shadow-md"
+            className="block rounded-2xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
           >
             <h2 className="text-base font-semibold text-stone-800">{type.title}</h2>
             <p className="mt-1 text-sm text-stone-500">{type.desc}</p>
           </Link>
         ))}
 
-        <div className="rounded-2xl border border-dashed border-stone-300 bg-white/60 p-4 text-xs text-stone-500">
+        <div className="rounded-2xl border border-dashed border-orange-200/90 bg-white/60 p-4 text-xs text-stone-500">
           下一步将进入表单页面（当前为原型骨架）。
         </div>
       </div>

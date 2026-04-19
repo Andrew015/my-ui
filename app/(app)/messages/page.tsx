@@ -11,7 +11,7 @@ export default function MessagesPage() {
     <div>
       <PageHeader title="消息" subtitle="最近联系人" />
 
-      <ul className="mx-4 my-4 divide-y divide-stone-200/90 rounded-2xl bg-white ring-1 ring-stone-200/80">
+      <ul className="mx-4 my-4 divide-y divide-orange-100/90 rounded-2xl bg-white ring-1 ring-orange-100/90">
         {placeholders.map((row) => (
           <li key={row.name}>
             <Link

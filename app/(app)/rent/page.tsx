@@ -56,7 +56,7 @@ export default function RentPage() {
     <div>
       <PageHeader title="短租用" backHref="/" subtitle="短期借用更划算" />
       <div className="px-4 py-4">
-        <div className="rounded-2xl bg-white px-3 py-2.5 shadow-sm ring-1 ring-stone-200/80">
+        <div className="rounded-2xl bg-white px-3 py-2.5 shadow-sm ring-1 ring-orange-100/90">
           <input
             value={keyword}
             onChange={(event) => setKeyword(event.target.value)}
@@ -76,8 +76,8 @@ export default function RentPage() {
                 onClick={() => setActiveCategory(category)}
                 className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition ${
                   active
-                    ? "bg-sky-600 text-white"
-                    : "bg-white text-stone-600 ring-1 ring-stone-200"
+                    ? "bg-secondary text-emphasis"
+                    : "bg-white text-stone-600 ring-1 ring-orange-100/80"
                 }`}
               >
                 {category}
@@ -86,7 +86,7 @@ export default function RentPage() {
           })}
         </div>
 
-        <div className="mt-2 rounded-xl bg-white ring-1 ring-stone-200/80">
+        <div className="mt-2 rounded-xl bg-white ring-1 ring-orange-100/90">
           <div className="grid grid-cols-4 p-1">
             {sortOptions.map((label) => {
               const active = label === activeSort;
@@ -107,7 +107,7 @@ export default function RentPage() {
                     setActiveSort(label);
                   }}
                   className={`rounded-lg px-1 py-1.5 text-xs font-medium transition ${
-                    active ? "bg-sky-50 text-sky-700" : "text-stone-500"
+                    active ? "bg-orange-50 text-emphasis" : "text-stone-500"
                   }`}
                 >
                   {label}
@@ -127,9 +127,9 @@ export default function RentPage() {
             <Link
               key={item.id}
               href={`/detail/${item.id}`}
-              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200/80 transition hover:shadow-md"
+              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
             >
-              <div className="relative h-32 bg-gradient-to-br from-stone-200 to-stone-100">
+              <div className="relative h-32 bg-gradient-to-br from-orange-100/90 to-stone-100">
                 <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-stone-600">
                   {item.category ?? "推荐"}
                 </span>
@@ -138,7 +138,7 @@ export default function RentPage() {
                 <h3 className="line-clamp-2 text-sm font-medium leading-5 text-stone-800">
                   {item.title}
                 </h3>
-                <p className="mt-1 text-base font-semibold text-sky-700">
+                <p className="mt-1 text-base font-semibold text-brand">
                   {item.priceLabel}
                 </p>
                 <div className="mt-1 flex items-center justify-between gap-2">
@@ -153,7 +153,7 @@ export default function RentPage() {
           ))}
         </div>
         {!list.length ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-stone-300 bg-white/70 py-8 text-center text-sm text-stone-500">
+          <div className="mt-6 rounded-2xl border border-dashed border-orange-200/80 bg-white/70 py-8 text-center text-sm text-stone-500">
             暂无匹配租赁信息，换个关键词试试
           </div>
         ) : null}

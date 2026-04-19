@@ -15,16 +15,16 @@ export default function CommunityPage() {
         <SectionTitle title="公益入口" />
         <Link
           href="/community/give"
-          className="block rounded-2xl bg-white p-5 shadow-sm ring-1 ring-stone-200/80 transition hover:shadow-md"
+          className="block rounded-2xl bg-white p-5 shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
         >
-          <h2 className="text-base font-semibold text-rose-800">免费赠送</h2>
+          <h2 className="text-base font-semibold text-emphasis">免费赠送</h2>
           <p className="mt-1 text-sm text-stone-500">送出闲置，送给需要的人</p>
         </Link>
         <Link
           href="/community/help"
-          className="block rounded-2xl bg-white p-5 shadow-sm ring-1 ring-stone-200/80 transition hover:shadow-md"
+          className="block rounded-2xl bg-white p-5 shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
         >
-          <h2 className="text-base font-semibold text-pink-800">互助服务</h2>
+          <h2 className="text-base font-semibold text-emphasis">互助服务</h2>
           <p className="mt-1 text-sm text-stone-500">技能与时间互助，邻里搭把手</p>
         </Link>
         <SectionTitle title="最新公益发布" subtitle={`${giveList.length + helpList.length} 条`} />

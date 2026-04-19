@@ -46,8 +46,8 @@ export function ChatRoom({ ownerName }: ChatRoomProps) {
             <div
               className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm leading-6 ${
                 message.role === "me"
-                  ? "bg-teal-600 text-white"
-                  : "bg-white text-stone-700 ring-1 ring-stone-200/80"
+                  ? "bg-brand text-brand-foreground"
+                  : "bg-white text-stone-700 ring-1 ring-orange-100/90"
               }`}
             >
               {message.text}
@@ -56,7 +56,7 @@ export function ChatRoom({ ownerName }: ChatRoomProps) {
         ))}
       </div>
 
-      <div className="mt-2 flex items-center gap-2 rounded-2xl bg-white p-2 ring-1 ring-stone-200/90">
+      <div className="mt-2 flex items-center gap-2 rounded-2xl bg-white p-2 ring-1 ring-orange-100/90">
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
@@ -72,7 +72,7 @@ export function ChatRoom({ ownerName }: ChatRoomProps) {
         <button
           type="button"
           onClick={handleSend}
-          className="shrink-0 rounded-xl bg-teal-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-teal-700"
+          className="shrink-0 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-brand-foreground transition hover:bg-brand-hover"
         >
           发送
         </button>

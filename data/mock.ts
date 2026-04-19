@@ -43,25 +43,25 @@ export const homeEntries: HomeEntry[] = [
     href: "/idle",
     title: "淘闲置",
     desc: "附近好物，轻松淘",
-    accent: "from-teal-400 to-emerald-500",
+    accent: "from-[#F97316] to-[#ea580c]",
   },
   {
     href: "/rent",
     title: "短租用",
     desc: "短期借用，不必囤货",
-    accent: "from-sky-400 to-cyan-500",
+    accent: "from-[#FACC15] to-[#FDBA74]",
   },
   {
     href: "/swap",
     title: "来置换",
     desc: "以物换物，各取所需",
-    accent: "from-amber-400 to-orange-500",
+    accent: "from-[#FDBA74] to-[#F97316]",
   },
   {
     href: "/community",
     title: "邻里公益",
     desc: "免费赠送、互助服务",
-    accent: "from-rose-400 to-pink-500",
+    accent: "from-[#fdba74] to-[#92400E]",
   },
 ];
 

@@ -14,7 +14,7 @@ export default function HomePage() {
   return (
     <div className="px-4 pt-2 pb-4">
       <header className="pt-3 pb-5">
-        <p className="text-xs font-medium uppercase tracking-widest text-teal-700/80">
+        <p className="text-xs font-medium uppercase tracking-widest text-emphasis/90">
           邻里流转
         </p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-stone-800">
@@ -47,7 +47,7 @@ export default function HomePage() {
         <div className="mt-3 grid gap-3">
           <Link
             href={swapEntry.href}
-            className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200/80"
+            className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90"
           >
             <div>
               <p className="text-base font-semibold text-stone-800">{swapEntry.title}</p>
@@ -57,7 +57,7 @@ export default function HomePage() {
           </Link>
           <Link
             href={communityEntry.href}
-            className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200/80"
+            className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90"
           >
             <div>
               <p className="text-base font-semibold text-stone-800">{communityEntry.title}</p>
@@ -72,13 +72,13 @@ export default function HomePage() {
       <section className="mt-8 grid grid-cols-2 gap-3">
         <Link
           href="/idle"
-          className="rounded-2xl bg-white p-4 text-center text-sm font-medium text-stone-700 ring-1 ring-stone-200/80"
+          className="rounded-2xl bg-white p-4 text-center text-sm font-medium text-stone-700 ring-1 ring-orange-100/90"
         >
           进入淘闲置
         </Link>
         <Link
           href="/publish"
-          className="rounded-2xl bg-white p-4 text-center text-sm font-medium text-stone-700 ring-1 ring-stone-200/80"
+          className="rounded-2xl bg-white p-4 text-center text-sm font-medium text-stone-700 ring-1 ring-orange-100/90"
         >
           去发布
         </Link>
@@ -91,12 +91,12 @@ export default function HomePage() {
             <Link
               key={item.id}
               href={`/detail/${item.id}`}
-              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-stone-200/80 transition hover:shadow-md"
+              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
             >
               <div className="h-24 bg-gradient-to-br from-stone-200 to-stone-100" />
               <div className="p-3">
                 <p className="line-clamp-2 text-sm font-medium text-stone-800">{item.title}</p>
-                <p className="mt-1 text-sm font-semibold text-rose-600">{item.priceLabel}</p>
+                <p className="mt-1 text-sm font-semibold text-brand">{item.priceLabel}</p>
                 <p className="mt-1 truncate text-[11px] text-stone-500">{item.location}</p>
               </div>
             </Link>
@@ -111,12 +111,12 @@ export default function HomePage() {
             <Link
               key={item.id}
               href={`/detail/${item.id}`}
-              className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-stone-200/80 transition hover:shadow-md"
+              className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
             >
-              <div className="h-16 w-16 shrink-0 rounded-xl bg-gradient-to-br from-sky-100 to-cyan-100" />
+              <div className="h-16 w-16 shrink-0 rounded-xl bg-gradient-to-br from-orange-50 to-yellow-50 ring-1 ring-orange-100/80" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-stone-800">{item.title}</p>
-                <p className="mt-0.5 text-sm font-semibold text-sky-700">{item.priceLabel}</p>
+                <p className="mt-0.5 text-sm font-semibold text-brand">{item.priceLabel}</p>
                 <p className="mt-0.5 truncate text-xs text-stone-500">{item.location}</p>
               </div>
             </Link>
@@ -131,13 +131,13 @@ export default function HomePage() {
             <Link
               key={item.id}
               href={`/detail/${item.id}`}
-              className="block w-full rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200/80 transition hover:shadow-md"
+              className="block w-full rounded-2xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="min-w-0 flex-1 truncate text-sm font-semibold text-stone-800">
                   {item.title}
                 </p>
-                <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                <span className="shrink-0 rounded-full bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-emphasis">
                   {item.priceLabel}
                 </span>
               </div>
@@ -149,7 +149,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-white p-4 ring-1 ring-stone-200/80">
+      <section className="mt-8 rounded-2xl bg-white p-4 ring-1 ring-orange-100/90">
         <p className="text-sm font-semibold text-stone-800">社区小提示</p>
         <p className="mt-2 text-sm leading-relaxed text-stone-500">
           优先选择同小区面交，互相说明物品状态与使用方式，让每一次流转都更安心、更友好。

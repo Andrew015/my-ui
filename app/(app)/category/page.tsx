@@ -20,7 +20,7 @@ export default function CategoryPage() {
           <Link
             key={row.href}
             href={row.href}
-            className="rounded-2xl bg-white py-6 text-center text-sm font-medium text-stone-700 shadow-sm ring-1 ring-stone-200/80 transition hover:bg-stone-50"
+            className="rounded-2xl bg-white py-6 text-center text-sm font-medium text-stone-700 shadow-sm ring-1 ring-orange-100/90 transition hover:bg-stone-50"
           >
             {row.name}
           </Link>

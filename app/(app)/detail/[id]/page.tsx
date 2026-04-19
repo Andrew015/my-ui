@@ -19,10 +19,10 @@ export default async function DetailPage({
     <div>
       <PageHeader title="详情" backHref="/" subtitle={channelMap[item.channel]} />
       <div className="space-y-4 px-4 py-4">
-        <div className="h-44 rounded-2xl bg-gradient-to-br from-stone-200 to-stone-100" />
-        <div className="rounded-2xl bg-white p-4 ring-1 ring-stone-200/80">
+        <div className="h-44 rounded-2xl bg-gradient-to-br from-orange-100/90 to-stone-100" />
+        <div className="rounded-2xl bg-white p-4 ring-1 ring-orange-100/90">
           <p className="text-lg font-semibold text-stone-800">{item.title}</p>
-          <p className="mt-2 text-base font-semibold text-teal-700">{item.priceLabel}</p>
+          <p className="mt-2 text-base font-semibold text-brand">{item.priceLabel}</p>
           <p className="mt-1 text-xs text-stone-500">
             {item.location} · 发布者 {item.owner}
           </p>
@@ -31,13 +31,13 @@ export default async function DetailPage({
         <div className="grid grid-cols-2 gap-3">
           <Link
             href={`/messages/${item.id}`}
-            className="rounded-xl bg-white py-3 text-center text-sm font-medium text-stone-700 ring-1 ring-stone-200/80"
+            className="rounded-xl bg-white py-3 text-center text-sm font-medium text-stone-700 ring-1 ring-orange-100/90"
           >
             联系对方
           </Link>
           <Link
             href="/publish"
-            className="rounded-xl bg-teal-600 py-3 text-center text-sm font-medium text-white"
+            className="rounded-xl bg-brand py-3 text-center text-sm font-medium text-brand-foreground transition hover:bg-brand-hover"
           >
             我也发布
           </Link>

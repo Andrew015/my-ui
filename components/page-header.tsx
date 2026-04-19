@@ -8,7 +8,7 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, backHref, subtitle }: PageHeaderProps) {
   return (
-    <header className="sticky top-0 z-10 border-b border-stone-200/80 bg-[#f4f7f4]/95 px-4 py-3 backdrop-blur-md">
+    <header className="sticky top-0 z-10 border-b border-orange-100/90 bg-surface/95 px-4 py-3 backdrop-blur-md">
       <div className="flex items-center gap-3">
       {backHref ? (
         <Link

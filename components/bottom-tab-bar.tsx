@@ -16,7 +16,7 @@ export function BottomTabBar() {
 
   return (
     <nav
-      className="shrink-0 border-t border-stone-200/90 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm"
+      className="shrink-0 border-t border-orange-100/90 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm"
       aria-label="主导航"
     >
       <div className="mx-auto flex max-w-[390px] items-stretch justify-around px-1 pt-1.5 pb-2">
@@ -31,7 +31,7 @@ export function BottomTabBar() {
               key={href}
               href={href}
               className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 transition-colors ${
-                active ? "text-teal-600" : "text-stone-400 hover:text-stone-600"
+                active ? "text-brand" : "text-stone-400 hover:text-stone-600"
               }`}
             >
               <Icon active={active} />

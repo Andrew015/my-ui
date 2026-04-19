@@ -23,10 +23,10 @@ export default async function MessageDetailPage({
       <div className="px-4 pt-3">
         <Link
           href={`/detail/${item.id}`}
-          className="block rounded-2xl bg-white p-3 shadow-sm ring-1 ring-stone-200/80"
+          className="block rounded-2xl bg-white p-3 shadow-sm ring-1 ring-orange-100/90"
         >
           <p className="text-sm font-semibold text-stone-800">{item.title}</p>
-          <p className="mt-1 text-sm font-semibold text-teal-700">{item.priceLabel}</p>
+          <p className="mt-1 text-sm font-semibold text-brand">{item.priceLabel}</p>
           <p className="mt-1 text-xs text-stone-500">
             {item.location} · {item.tag}
           </p>
