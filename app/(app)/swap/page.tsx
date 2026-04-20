@@ -2,12 +2,17 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { FavoriteButton } from "@/components/favorite-button";
 import { PageHeader } from "@/components/page-header";
-import { getItemsByChannel } from "@/data/mock";
+import { getActiveMarketplaceItemsByChannel, useMarketplaceStore } from "@/data/marketplace-store";
 
 export default function SwapPage() {
   const [keyword, setKeyword] = useState("");
-  const list = getItemsByChannel("swap");
+  const marketplace = useMarketplaceStore();
+  const list = useMemo(
+    () => getActiveMarketplaceItemsByChannel("swap"),
+    [marketplace.statusById],
+  );
   const filtered = useMemo(() => {
     const search = keyword.trim().toLowerCase();
     if (!search) return list;
@@ -63,8 +68,9 @@ export default function SwapPage() {
               <Link
                 key={item.id}
                 href={`/detail/${item.id}`}
-                className="mb-3 block break-inside-avoid overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
+                className="relative mb-3 block break-inside-avoid overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
               >
+                <FavoriteButton itemId={item.id} className="absolute right-2 top-2" />
                 <div
                   className={`bg-gradient-to-br from-orange-100/80 to-stone-100 ${
                     item.imageHeight === "lg"

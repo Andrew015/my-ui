@@ -1,20 +1,40 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { IdleCategoryTabs } from "@/components/idle-category-tabs";
+import { IdleSearchBar } from "@/components/idle-search-bar";
+import { IdleSortBar, type IdleSortKey } from "@/components/idle-sort-bar";
+import { ItemCard } from "@/components/item-card";
+import { ItemGrid } from "@/components/item-grid";
 import { PageHeader } from "@/components/page-header";
-import { idleCategories, type IdleCategory, getItemsByChannel } from "@/data/mock";
+import {
+  type IdleCategory,
+  getItemSortPrice,
+} from "@/data/mock";
+import { getActiveMarketplaceItemsByChannel, useMarketplaceStore } from "@/data/marketplace-store";
 
-type SortKey = "综合" | "最新" | "距离最近" | "价格";
-
-const sortOptions: SortKey[] = ["综合", "最新", "距离最近", "价格"];
-
-export default function IdlePage() {
-  const allIdleItems = getItemsByChannel("idle");
+function IdlePageInner() {
+  const searchParams = useSearchParams();
+  const marketplace = useMarketplaceStore();
+  const allIdleItems = useMemo(
+    () => getActiveMarketplaceItemsByChannel("idle"),
+    [marketplace.statusById],
+  );
   const [keyword, setKeyword] = useState("");
   const [activeCategory, setActiveCategory] = useState<IdleCategory>("推荐");
-  const [activeSort, setActiveSort] = useState<SortKey>("综合");
+  const [activeSort, setActiveSort] = useState<IdleSortKey>("综合");
   const [priceOrder, setPriceOrder] = useState<"asc" | "desc">("asc");
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) setKeyword(q);
+  }, [searchParams]);
+
+  const handleSortChange = (sort: IdleSortKey) => {
+    setActiveSort(sort);
+    if (sort === "价格") setPriceOrder("asc");
+  };
 
   const list = useMemo(() => {
     const byCategory =
@@ -25,10 +45,7 @@ export default function IdlePage() {
     const search = keyword.trim().toLowerCase();
     const filtered = !search
       ? byCategory
-      : byCategory.filter((item) => {
-          const source = `${item.title} ${item.tag} ${item.location}`.toLowerCase();
-          return source.includes(search);
-        });
+      : byCategory.filter((item) => item.title.toLowerCase().includes(search));
 
     const sorted = [...filtered];
     if (activeSort === "最新") {
@@ -36,13 +53,16 @@ export default function IdlePage() {
         (a, b) =>
           new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime(),
       );
-    } else if (activeSort === "距离最近") {
-      sorted.sort((a, b) => (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER));
+    } else if (activeSort === "附近") {
+      sorted.sort(
+        (a, b) =>
+          (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER),
+      );
     } else if (activeSort === "价格") {
       sorted.sort((a, b) =>
         priceOrder === "asc"
-          ? parsePrice(a.priceLabel) - parsePrice(b.priceLabel)
-          : parsePrice(b.priceLabel) - parsePrice(a.priceLabel),
+          ? getItemSortPrice(a) - getItemSortPrice(b)
+          : getItemSortPrice(b) - getItemSortPrice(a),
       );
     }
 
@@ -50,117 +70,61 @@ export default function IdlePage() {
   }, [activeCategory, activeSort, allIdleItems, keyword, priceOrder]);
 
   return (
-    <div>
-      <PageHeader title="淘闲置" backHref="/" subtitle="像电商一样逛社区闲置" />
-      <div className="px-4 py-4">
-        <div className="rounded-2xl bg-white px-3 py-2.5 shadow-sm ring-1 ring-orange-100/90">
-          <input
-            value={keyword}
-            onChange={(event) => setKeyword(event.target.value)}
-            placeholder="搜索闲置商品"
-            className="w-full bg-transparent text-sm text-stone-700 placeholder:text-stone-400 outline-none"
-            aria-label="搜索闲置商品"
+    <div className="flex min-h-0 flex-1 flex-col">
+      <PageHeader
+        title="淘闲置"
+        backHref="/"
+        rightSlot={
+          <button
+            type="button"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-stone-400 transition-colors hover:bg-orange-50 hover:text-emphasis"
+            aria-label="筛选（即将上线）"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M4 6h16M7 12h10M10 18h4" strokeLinecap="round" />
+            </svg>
+          </button>
+        }
+      />
+
+      <div className="flex min-h-0 flex-1 flex-col px-4 pb-3 pt-3">
+        <IdleSearchBar value={keyword} onChange={setKeyword} />
+
+        <div className="mt-2">
+          <IdleCategoryTabs active={activeCategory} onChange={setActiveCategory} />
+        </div>
+
+        <div className="mt-2">
+          <IdleSortBar
+            activeSort={activeSort}
+            priceOrder={priceOrder}
+            onSortChange={handleSortChange}
+            onPriceToggle={() => setPriceOrder((p) => (p === "asc" ? "desc" : "asc"))}
           />
         </div>
 
-        <div className="mt-3 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-          {idleCategories.map((category) => {
-            const active = category === activeCategory;
-            return (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  active
-                    ? "bg-brand text-brand-foreground"
-                    : "bg-white text-stone-600 ring-1 ring-orange-100/80"
-                }`}
-              >
-                {category}
-              </button>
-            );
-          })}
-        </div>
+        <div className="mt-7 min-h-0 flex-1 rounded-t-2xl bg-[#F5F5F5] px-2 pb-6 pt-4 ring-1 ring-stone-200/40">
+          <ItemGrid>
+            {list.map((item) => (
+              <ItemCard key={item.id} item={item} variant="grid" />
+            ))}
+          </ItemGrid>
 
-        <div className="mt-2 rounded-xl bg-white ring-1 ring-orange-100/90">
-          <div className="grid grid-cols-4 p-1">
-          {sortOptions.map((label) => {
-            const active = label === activeSort;
-            return (
-              <button
-                key={label}
-                type="button"
-                onClick={() => {
-                  if (label === "价格") {
-                    if (activeSort === "价格") {
-                      setPriceOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-                    } else {
-                      setActiveSort("价格");
-                      setPriceOrder("asc");
-                    }
-                    return;
-                  }
-                  setActiveSort(label);
-                }}
-                className={`rounded-lg px-1 py-1.5 text-xs font-medium transition ${
-                  active ? "bg-orange-50 text-emphasis" : "text-stone-500"
-                }`}
-              >
-                {label}
-                {label === "价格" && activeSort === "价格"
-                  ? priceOrder === "asc"
-                    ? " ↑"
-                    : " ↓"
-                  : ""}
-              </button>
-            );
-          })}
-          </div>
+          {!list.length ? (
+            <div className="mx-1 mt-4 rounded-xl border border-dashed border-orange-200/90 bg-white py-10 text-center text-sm text-stone-500">
+              暂无匹配商品，换个关键词试试
+            </div>
+          ) : null}
         </div>
-
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          {list.map((item) => (
-            <Link
-              key={item.id}
-              href={`/detail/${item.id}`}
-              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
-            >
-              <div className="relative h-32 bg-gradient-to-br from-orange-100/90 to-stone-100">
-                <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-stone-600">
-                  {item.category ?? "推荐"}
-                </span>
-              </div>
-              <div className="p-3">
-                <h3 className="line-clamp-2 text-sm font-medium leading-5 text-stone-800">
-                  {item.title}
-                </h3>
-                <p className="mt-1 text-base font-semibold text-brand">
-                  {item.priceLabel}
-                </p>
-                <div className="mt-1 flex items-center justify-between gap-2">
-                  <span className="truncate text-[11px] text-stone-500">{item.tag}</span>
-                  <span className="truncate text-[11px] text-stone-400">
-                    {item.location}
-                    {item.distanceKm ? ` · ${item.distanceKm}km` : ""}
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-        {!list.length ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-orange-200/80 bg-white/70 py-8 text-center text-sm text-stone-500">
-            暂无匹配商品，换个关键词试试
-          </div>
-        ) : null}
       </div>
     </div>
   );
 }
 
-function parsePrice(priceLabel: string) {
-  const match = priceLabel.match(/\d+(\.\d+)?/);
-  if (!match) return Number.MAX_SAFE_INTEGER;
-  return Number(match[0]);
+export default function IdlePage() {
+  return (
+    <Suspense fallback={<div className="min-h-[50dvh] bg-surface" aria-hidden />}>
+      <IdlePageInner />
+    </Suspense>
+  );
 }

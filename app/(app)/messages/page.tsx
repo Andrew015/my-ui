@@ -3,12 +3,12 @@ import { PageHeader } from "@/components/page-header";
 
 export default function MessagesPage() {
   const placeholders = [
-    { name: "李阿姨", preview: "你好，椅子还在，欢迎来看看", href: "/messages/idle-chair-001" },
-    { name: "王师傅", preview: "冲击钻可以按天租，今天可取", href: "/messages/rent-drill-101" },
+    { name: "李阿姨", preview: "你好，椅子还在，欢迎来看看", href: "/messages/idle-chair-001", time: "14:33", status: "在线" },
+    { name: "王师傅", preview: "冲击钻可以按天租，今天可取", href: "/messages/rent-drill-101", time: "13:20", status: "1小时前活跃" },
   ];
 
   return (
-    <div>
+    <div className="bg-[#F5F5F5]">
       <PageHeader title="消息" subtitle="最近联系人" />
 
       <ul className="mx-4 my-4 divide-y divide-orange-100/90 rounded-2xl bg-white ring-1 ring-orange-100/90">
@@ -24,11 +24,12 @@ export default function MessagesPage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium text-stone-800">{row.name}</span>
-                  <span className="text-xs text-stone-400">刚刚</span>
+                  <span className="text-xs text-stone-400">{row.time}</span>
                 </div>
                 <p className="mt-0.5 truncate text-sm text-stone-500">
                   {row.preview}
                 </p>
+                <p className="mt-1 text-xs text-stone-400">{row.status}</p>
               </div>
             </Link>
           </li>

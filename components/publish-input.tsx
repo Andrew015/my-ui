@@ -1,0 +1,37 @@
+"use client";
+
+type PublishInputProps = {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  maxLength?: number;
+};
+
+export function PublishInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  maxLength,
+}: PublishInputProps) {
+  return (
+    <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90">
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-semibold text-stone-800">{label}</label>
+        {maxLength ? (
+          <span className="text-xs text-stone-400">
+            {value.length}/{maxLength}
+          </span>
+        ) : null}
+      </div>
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        className="mt-3 w-full rounded-xl border border-stone-200 bg-white px-3 py-3 text-sm text-stone-700 outline-none transition placeholder:text-stone-400 focus:border-orange-300 focus:ring-2 focus:ring-orange-100"
+      />
+    </section>
+  );
+}

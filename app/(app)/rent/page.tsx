@@ -2,15 +2,21 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { FavoriteButton } from "@/components/favorite-button";
 import { PageHeader } from "@/components/page-header";
-import { getItemsByChannel, rentCategories, type RentCategory } from "@/data/mock";
+import { rentCategories, type RentCategory } from "@/data/mock";
+import { getActiveMarketplaceItemsByChannel, useMarketplaceStore } from "@/data/marketplace-store";
 
 type SortKey = "综合" | "最新" | "距离最近" | "价格";
 
 const sortOptions: SortKey[] = ["综合", "最新", "距离最近", "价格"];
 
 export default function RentPage() {
-  const allRentItems = getItemsByChannel("rent");
+  const marketplace = useMarketplaceStore();
+  const allRentItems = useMemo(
+    () => getActiveMarketplaceItemsByChannel("rent"),
+    [marketplace.statusById],
+  );
   const [keyword, setKeyword] = useState("");
   const [activeCategory, setActiveCategory] = useState<RentCategory>("推荐");
   const [activeSort, setActiveSort] = useState<SortKey>("综合");
@@ -127,8 +133,9 @@ export default function RentPage() {
             <Link
               key={item.id}
               href={`/detail/${item.id}`}
-              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
+              className="relative overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-orange-100/90 transition hover:shadow-md"
             >
+              <FavoriteButton itemId={item.id} className="absolute right-2 top-2" />
               <div className="relative h-32 bg-gradient-to-br from-orange-100/90 to-stone-100">
                 <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-stone-600">
                   {item.category ?? "推荐"}

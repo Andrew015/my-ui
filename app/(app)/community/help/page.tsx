@@ -1,10 +1,17 @@
+"use client";
+
+import { useMemo } from "react";
 import { PageHeader } from "@/components/page-header";
 import { ItemCard } from "@/components/item-card";
 import { SectionTitle } from "@/components/section-title";
-import { getItemsByChannel } from "@/data/mock";
+import { getActiveMarketplaceItemsByChannel, useMarketplaceStore } from "@/data/marketplace-store";
 
 export default function CommunityHelpPage() {
-  const list = getItemsByChannel("help");
+  const marketplace = useMarketplaceStore();
+  const list = useMemo(
+    () => getActiveMarketplaceItemsByChannel("help"),
+    [marketplace.statusById],
+  );
 
   return (
     <div>

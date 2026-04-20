@@ -1,12 +1,22 @@
+"use client";
+
 import Link from "next/link";
+import { useMemo } from "react";
 import { PageHeader } from "@/components/page-header";
 import { SectionTitle } from "@/components/section-title";
-import { getItemsByChannel } from "@/data/mock";
 import { ItemCard } from "@/components/item-card";
+import { getActiveMarketplaceItemsByChannel, useMarketplaceStore } from "@/data/marketplace-store";
 
 export default function CommunityPage() {
-  const giveList = getItemsByChannel("give");
-  const helpList = getItemsByChannel("help");
+  const marketplace = useMarketplaceStore();
+  const giveList = useMemo(
+    () => getActiveMarketplaceItemsByChannel("give"),
+    [marketplace.statusById],
+  );
+  const helpList = useMemo(
+    () => getActiveMarketplaceItemsByChannel("help"),
+    [marketplace.statusById],
+  );
 
   return (
     <div>
