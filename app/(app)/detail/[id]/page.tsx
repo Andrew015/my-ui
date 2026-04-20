@@ -20,9 +20,9 @@ export default function DetailPage() {
   const item = getMarketplaceItemById(id);
 
   useEffect(() => {
-    if (!item) return;
-    addToHistory(item.id);
-  }, [item]);
+    if (!id || !item) return;
+    addToHistory(id);
+  }, [id]);
 
   if (!item) {
     return (
