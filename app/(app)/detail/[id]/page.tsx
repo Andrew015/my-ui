@@ -2,16 +2,30 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { FavoriteButton } from "@/components/favorite-button";
 import { PageHeader } from "@/components/page-header";
+import { RelatedSection } from "@/components/related-section";
 import {
   channelMap,
   getItemDetailBody,
   getItemDetailTags,
 } from "@/data/mock";
-import { addToHistory, getMarketplaceItemById, useMarketplaceStore } from "@/data/marketplace-store";
+import {
+  addToHistory,
+  getActiveMarketplaceItemsByChannel,
+  getMarketplaceItemById,
+  getMarketplaceItemsByChannel,
+  useMarketplaceStore,
+} from "@/data/marketplace-store";
 import { getItemCoverClass } from "@/lib/item-cover";
+
+function getListingType(channel: "idle" | "rent" | "swap" | "give" | "help") {
+  if (channel === "idle") return "sell";
+  if (channel === "rent") return "rent";
+  if (channel === "swap") return "swap";
+  return "community";
+}
 
 export default function DetailPage() {
   const params = useParams<{ id: string }>();
@@ -70,6 +84,71 @@ export default function DetailPage() {
       ? "发布者已暂时下架此信息"
       : "该商品/服务已完成交易或处理";
   const isActive = item.status === "active";
+
+  const uniqueById = <T extends { id: string }>(list: T[]) => {
+    const seen = new Set<string>();
+    return list.filter((entry) => {
+      if (seen.has(entry.id)) return false;
+      seen.add(entry.id);
+      return true;
+    });
+  };
+
+  const activePool = useMemo(
+    () => [
+      ...getActiveMarketplaceItemsByChannel("idle"),
+      ...getActiveMarketplaceItemsByChannel("rent"),
+      ...getActiveMarketplaceItemsByChannel("swap"),
+      ...getActiveMarketplaceItemsByChannel("give"),
+      ...getActiveMarketplaceItemsByChannel("help"),
+    ],
+    [marketplace.statusById, marketplace.deletedIds],
+  );
+  const allPool = useMemo(
+    () => [
+      ...getMarketplaceItemsByChannel("idle"),
+      ...getMarketplaceItemsByChannel("rent"),
+      ...getMarketplaceItemsByChannel("swap"),
+      ...getMarketplaceItemsByChannel("give"),
+      ...getMarketplaceItemsByChannel("help"),
+    ],
+    [marketplace.statusById, marketplace.deletedIds],
+  );
+  const relatedByCategory = useMemo(() => {
+    const currentType = getListingType(item.channel);
+    const sameTypeActive = activePool.filter(
+      (candidate) =>
+        candidate.id !== item.id && getListingType(candidate.channel) === currentType,
+    );
+    const sameCategoryActive =
+      item.category != null
+        ? sameTypeActive.filter((candidate) => candidate.category === item.category)
+        : sameTypeActive;
+
+    if (sameCategoryActive.length >= 2) return sameCategoryActive.slice(0, 4);
+
+    const sameTypeAnyStatus = allPool.filter(
+      (candidate) =>
+        candidate.id !== item.id && getListingType(candidate.channel) === currentType,
+    );
+    const mergedSameType = uniqueById([...sameCategoryActive, ...sameTypeAnyStatus]);
+    if (mergedSameType.length >= 2) return mergedSameType.slice(0, 4);
+
+    const mergedWithGlobal = uniqueById([
+      ...mergedSameType,
+      ...activePool.filter((candidate) => candidate.id !== item.id),
+    ]);
+    return mergedWithGlobal.slice(0, Math.min(4, mergedWithGlobal.length));
+  }, [activePool, allPool, item.category, item.channel, item.id]);
+  const guessLike = useMemo(() => {
+    const candidates = activePool.filter((candidate) => candidate.id !== item.id);
+    if (candidates.length) {
+      return [...candidates].sort(() => Math.random() - 0.5).slice(0, 6);
+    }
+    return [...allPool.filter((candidate) => candidate.id !== item.id)]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 6);
+  }, [activePool, allPool, item.id]);
 
   return (
     <div className="flex flex-col" key={marketplace.statusById[item.id] ?? "active"}>
@@ -153,10 +232,19 @@ export default function DetailPage() {
           <h2 className="text-sm font-semibold text-stone-800">商品描述</h2>
           <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-stone-600">{body}</p>
         </section>
+
+        {relatedByCategory.length ? (
+          <div className="mt-4">
+            <RelatedSection title="同类推荐 · 附近相似" items={relatedByCategory} />
+          </div>
+        ) : null}
+        <div className="mt-6">
+          <RelatedSection title="猜你喜欢" items={guessLike} variant="grid" />
+        </div>
       </div>
 
       {isActive ? (
-        <div className="sticky bottom-0 z-30 flex gap-3 border-t border-orange-100/90 bg-white/98 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] backdrop-blur-md pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-[-1.5rem] z-30 flex gap-3 border-t border-orange-100/90 bg-white/98 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] backdrop-blur-md">
           <Link
             href={`/messages/${item.id}`}
             className="flex min-h-[48px] flex-[1.1] items-center justify-center rounded-xl bg-brand text-sm font-semibold text-brand-foreground shadow-sm transition hover:bg-brand-hover"
@@ -171,7 +259,7 @@ export default function DetailPage() {
           </Link>
         </div>
       ) : item.status === "done" ? (
-        <div className="sticky bottom-0 z-30 border-t border-orange-100/90 bg-white/98 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] backdrop-blur-md pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-[-1.5rem] z-30 border-t border-orange-100/90 bg-white/98 px-4 py-3 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] backdrop-blur-md">
           <Link
             href="/publish"
             className="flex min-h-[48px] w-full items-center justify-center rounded-xl bg-brand text-sm font-semibold text-brand-foreground shadow-sm transition hover:bg-brand-hover"

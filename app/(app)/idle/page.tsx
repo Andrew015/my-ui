@@ -14,6 +14,9 @@ import {
 } from "@/data/mock";
 import { getActiveMarketplaceItemsByChannel, useMarketplaceStore } from "@/data/marketplace-store";
 
+const SEARCH_HISTORY_KEY = "idle-search-history";
+const HOT_KEYWORDS = ["相机", "婴儿车", "打印机", "书桌", "折叠椅"];
+
 function IdlePageInner() {
   const searchParams = useSearchParams();
   const marketplace = useMarketplaceStore();
@@ -22,6 +25,8 @@ function IdlePageInner() {
     [marketplace.statusById],
   );
   const [keyword, setKeyword] = useState("");
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [searchMode, setSearchMode] = useState(false);
   const [activeCategory, setActiveCategory] = useState<IdleCategory>("推荐");
   const [activeSort, setActiveSort] = useState<IdleSortKey>("综合");
   const [priceOrder, setPriceOrder] = useState<"asc" | "desc">("asc");
@@ -31,9 +36,41 @@ function IdlePageInner() {
     if (q) setKeyword(q);
   }, [searchParams]);
 
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(SEARCH_HISTORY_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as string[];
+      if (Array.isArray(parsed)) setSearchHistory(parsed.slice(0, 8));
+    } catch {
+      // ignore localStorage read errors
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory.slice(0, 8)));
+    } catch {
+      // ignore localStorage write errors
+    }
+  }, [searchHistory]);
+
   const handleSortChange = (sort: IdleSortKey) => {
     setActiveSort(sort);
     if (sort === "价格") setPriceOrder("asc");
+  };
+
+  const pushSearchHistory = (text: string) => {
+    const normalized = text.trim();
+    if (!normalized) return;
+    setSearchHistory((prev) => [normalized, ...prev.filter((item) => item !== normalized)].slice(0, 8));
+  };
+
+  const runSearch = (text: string) => {
+    const normalized = text.trim();
+    setKeyword(normalized);
+    if (normalized) pushSearchHistory(normalized);
+    setSearchMode(false);
   };
 
   const list = useMemo(() => {
@@ -88,7 +125,59 @@ function IdlePageInner() {
       />
 
       <div className="flex min-h-0 flex-1 flex-col px-4 pb-3 pt-3">
-        <IdleSearchBar value={keyword} onChange={setKeyword} />
+        <IdleSearchBar
+          value={keyword}
+          onChange={setKeyword}
+          onFocus={() => setSearchMode(true)}
+          onSubmit={() => runSearch(keyword)}
+          showCancel={searchMode}
+          onCancel={() => setSearchMode(false)}
+        />
+
+        {searchMode ? (
+          <div className="mt-2 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-orange-100/90">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-stone-700">搜索历史</h3>
+              <button
+                type="button"
+                onClick={() => setSearchHistory([])}
+                className="text-xs text-stone-400 hover:text-stone-600"
+              >
+                清空历史
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {searchHistory.length ? (
+                searchHistory.map((word) => (
+                  <button
+                    key={word}
+                    type="button"
+                    onClick={() => runSearch(word)}
+                    className="rounded-full bg-stone-100 px-3 py-1 text-xs text-stone-600"
+                  >
+                    {word}
+                  </button>
+                ))
+              ) : (
+                <p className="text-xs text-stone-400">暂无搜索历史</p>
+              )}
+            </div>
+
+            <h3 className="mt-4 text-sm font-semibold text-stone-700">热门搜索</h3>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {HOT_KEYWORDS.map((word) => (
+                <button
+                  key={word}
+                  type="button"
+                  onClick={() => runSearch(word)}
+                  className="rounded-full bg-orange-50 px-3 py-1 text-xs text-orange-600"
+                >
+                  {word}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-2">
           <IdleCategoryTabs active={activeCategory} onChange={setActiveCategory} />
@@ -111,8 +200,20 @@ function IdlePageInner() {
           </ItemGrid>
 
           {!list.length ? (
-            <div className="mx-1 mt-4 rounded-xl border border-dashed border-orange-200/90 bg-white py-10 text-center text-sm text-stone-500">
-              暂无匹配商品，换个关键词试试
+            <div className="mx-1 mt-4 rounded-xl border border-dashed border-orange-200/90 bg-white py-10 text-center">
+              <p className="text-sm text-stone-500">没有找到相关闲置</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setKeyword("");
+                  setActiveCategory("推荐");
+                  setActiveSort("综合");
+                  setPriceOrder("asc");
+                }}
+                className="mt-3 rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-600"
+              >
+                看看推荐
+              </button>
             </div>
           ) : null}
         </div>
