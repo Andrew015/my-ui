@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FavoriteButton } from "@/components/favorite-button";
+import { getItemSupportTagLabels } from "@/data/mock";
 import { getItemCoverClass } from "@/lib/item-cover";
 import type { Item } from "@/data/mock";
 
@@ -9,6 +10,8 @@ type ItemCardProps = {
 };
 
 export function ItemCard({ item, variant = "row" }: ItemCardProps) {
+  const supportTags = getItemSupportTagLabels(item);
+
   if (variant === "grid") {
     const distanceLine =
       item.distanceKm != null ? `${item.location} · ${item.distanceKm}km` : item.location;
@@ -33,6 +36,18 @@ export function ItemCard({ item, variant = "row" }: ItemCardProps) {
             {item.title}
           </h3>
           <p className="text-xl font-semibold tabular-nums leading-none text-brand">{item.priceLabel}</p>
+          {supportTags.length ? (
+            <div className="flex flex-wrap gap-1">
+              {supportTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded bg-orange-50 px-1.5 py-0.5 text-[10px] leading-tight text-orange-600"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
           <span className="inline-flex max-w-full rounded bg-stone-100 px-1.5 py-0.5 text-[10px] leading-tight text-stone-500">
             {item.tag}
           </span>
@@ -56,6 +71,15 @@ export function ItemCard({ item, variant = "row" }: ItemCardProps) {
         </span>
       </div>
       <p className="mt-2 text-sm font-semibold text-brand">{item.priceLabel}</p>
+      {supportTags.length ? (
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          {supportTags.map((tag) => (
+            <span key={tag} className="rounded bg-orange-50 px-2 py-0.5 text-[11px] text-orange-600">
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
       <p className="mt-1 text-xs text-stone-500">
         {item.location} · {item.owner}
       </p>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { createNotification } from "@/data/notification-store";
 import {
+  currentUser,
   getMyPublishedItems,
   items,
   type Channel,
@@ -14,6 +16,7 @@ type MarketplaceState = {
   deletedIds: Record<string, true>;
   favoriteById: Record<string, true>;
   history: Array<{ id: string; viewedAt: number }>;
+  currentLocation: string;
 };
 
 export type MarketplaceItem = Item & {
@@ -27,7 +30,13 @@ function createInitialState(): MarketplaceState {
   getMyPublishedItems().forEach((item) => {
     statusById[item.id] = item.status;
   });
-  return { statusById, deletedIds: {}, favoriteById: {}, history: [] };
+  return {
+    statusById,
+    deletedIds: {},
+    favoriteById: {},
+    history: [],
+    currentLocation: "北京市朝阳区 · 锦绣里",
+  };
 }
 
 let state: MarketplaceState = createInitialState();
@@ -61,6 +70,28 @@ export function updateItemStatus(id: string, status: PublishedStatus) {
       [id]: status,
     },
   };
+  const item = items.find((x) => x.id === id);
+  if (item && item.ownerId !== currentUser.id) {
+    if (status === "offline") {
+      createNotification({
+        userId: currentUser.id,
+        type: "item_offline",
+        title: "商品已下架",
+        content: `你关注的「${item.title}」已下架`,
+        relatedId: item.id,
+        relatedType: "item",
+      });
+    } else if (status === "done") {
+      createNotification({
+        userId: currentUser.id,
+        type: "item_completed",
+        title: "商品已完成",
+        content: `你关注的「${item.title}」已完成`,
+        relatedId: item.id,
+        relatedType: "item",
+      });
+    }
+  }
   emit();
 }
 
@@ -121,8 +152,18 @@ export function getMarketplaceItemsByChannel(channel: Channel): MarketplaceItem[
     .map((item) => ({ ...item, status: getMarketplaceItemStatus(item.id) }));
 }
 
+export function getAllMarketplaceItems(): MarketplaceItem[] {
+  return items
+    .filter((item) => !isMarketplaceItemDeleted(item.id))
+    .map((item) => ({ ...item, status: getMarketplaceItemStatus(item.id) }));
+}
+
 export function getActiveMarketplaceItemsByChannel(channel: Channel): MarketplaceItem[] {
   return getMarketplaceItemsByChannel(channel).filter((item) => item.status === "active");
+}
+
+export function getActiveMarketplaceItems(): MarketplaceItem[] {
+  return getAllMarketplaceItems().filter((item) => item.status === "active");
 }
 
 export function getFavoriteItems(): MarketplaceItem[] {
@@ -201,4 +242,17 @@ export function getActiveCommunityItems() {
     ...getActiveMarketplaceItemsByChannel("give"),
     ...getActiveMarketplaceItemsByChannel("help"),
   ];
+}
+
+export function getCurrentLocation() {
+  return state.currentLocation;
+}
+
+export function setCurrentLocation(next: string) {
+  if (!next.trim()) return;
+  state = {
+    ...state,
+    currentLocation: next.trim(),
+  };
+  emit();
 }

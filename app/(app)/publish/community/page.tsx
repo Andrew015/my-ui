@@ -9,6 +9,13 @@ import { ImageUploader } from "@/components/image-uploader";
 import { PageHeader } from "@/components/page-header";
 import { PublishToast } from "@/components/publish-toast";
 import { SubmitFooter } from "@/components/submit-footer";
+import { SupportModeSelector } from "@/components/support-mode-selector";
+import {
+  modulesToFormState,
+  publishedAdditionalTradePayload,
+  type TradeModule,
+  validateAdditionalTradeForm,
+} from "@/data/additional-trade";
 import { createPublishedMockItem, publishCategories } from "@/data/mock";
 
 const communityTabs = [
@@ -26,6 +33,7 @@ export default function PublishCommunityPage() {
   const [category, setCategory] = useState<(typeof publishCategories)[number]>("家居");
   const [pickupMethod, setPickupMethod] = useState<"自取" | "联系">("自取");
   const [images, setImages] = useState<string[]>([]);
+  const [tradeModules, setTradeModules] = useState<TradeModule[]>([]);
   const [location] = useState("锦绣里 · 距离 3.8km");
 
   const [serviceTitle, setServiceTitle] = useState("");
@@ -39,6 +47,15 @@ export default function PublishCommunityPage() {
   };
 
   const onSubmit = () => {
+    const tradeCheck = validateAdditionalTradeForm(modulesToFormState(tradeModules));
+    if (!tradeCheck.ok) {
+      setToast(tradeCheck.message);
+      setTimeout(() => setToast(null), 1800);
+      return;
+    }
+
+    const tradePayload = publishedAdditionalTradePayload(modulesToFormState(tradeModules));
+
     if (tab === "give") {
       if (!title.trim()) {
         setToast("请先填写标题");
@@ -52,6 +69,7 @@ export default function PublishCommunityPage() {
         category,
         tags: [pickupMethod],
         pickupMethod,
+        ...tradePayload,
         location,
         images,
       };
@@ -69,6 +87,7 @@ export default function PublishCommunityPage() {
         description: serviceDesc.trim(),
         category: "运动" as const,
         tags: ["互助服务"],
+        ...tradePayload,
         serviceTime: serviceTime.trim(),
         serviceArea: serviceArea.trim(),
         contactNote: contactNote.trim(),
@@ -111,31 +130,41 @@ export default function PublishCommunityPage() {
 
         {tab === "give" ? (
           <>
-            <ImageUploader images={images} onAddImage={onAddImage} />
-            <FormInput
-              label="标题"
-              value={title}
-              onChange={setTitle}
-              placeholder="给你的赠送物品起个标题"
-              maxLength={30}
+            <section className="space-y-3" aria-label="基础信息">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">基础信息</h2>
+              <ImageUploader images={images} onAddImage={onAddImage} />
+              <FormInput
+                label="标题"
+                value={title}
+                onChange={setTitle}
+                placeholder="给你的赠送物品起个标题"
+                maxLength={30}
+              />
+              <FormTextarea
+                label="描述"
+                value={desc}
+                onChange={setDesc}
+                placeholder="描述一下物品状态、领取方式…"
+              />
+              <CategorySelector
+                categories={publishCategories}
+                selectedCategory={category}
+                onSelect={(value) => setCategory(value as (typeof publishCategories)[number])}
+              />
+              <CategorySelector
+                label="领取方式"
+                categories={["自取", "联系"]}
+                selectedCategory={pickupMethod}
+                onSelect={(value) => setPickupMethod(value as "自取" | "联系")}
+              />
+            </section>
+
+            <SupportModeSelector
+              primaryMode="community"
+              modules={tradeModules}
+              onChange={setTradeModules}
             />
-            <FormTextarea
-              label="描述"
-              value={desc}
-              onChange={setDesc}
-              placeholder="描述一下物品状态、领取方式…"
-            />
-            <CategorySelector
-              categories={publishCategories}
-              selectedCategory={category}
-              onSelect={(value) => setCategory(value as (typeof publishCategories)[number])}
-            />
-            <CategorySelector
-              label="领取方式"
-              categories={["自取", "联系"]}
-              selectedCategory={pickupMethod}
-              onSelect={(value) => setPickupMethod(value as "自取" | "联系")}
-            />
+
             <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90">
               <h2 className="text-sm font-semibold text-stone-800">位置</h2>
               <p className="mt-2 text-sm text-stone-600">{location}</p>
@@ -143,37 +172,46 @@ export default function PublishCommunityPage() {
           </>
         ) : (
           <>
-            <FormInput
-              label="服务标题"
-              value={serviceTitle}
-              onChange={setServiceTitle}
-              placeholder="例如：周末家电小修互助"
-              maxLength={30}
-            />
-            <FormTextarea
-              label="服务说明"
-              value={serviceDesc}
-              onChange={setServiceDesc}
-              placeholder="介绍可提供的帮助内容与限制条件"
-            />
-            <FormInput
-              label="可服务时间"
-              value={serviceTime}
-              onChange={setServiceTime}
-              placeholder="例如：工作日 19:00 后 / 周末全天"
-            />
-            <FormInput
-              label="区域"
-              value={serviceArea}
-              onChange={setServiceArea}
-              placeholder="例如：锦绣里及周边 2km"
-            />
-            <FormTextarea
-              label="联系方式说明"
-              value={contactNote}
-              onChange={setContactNote}
-              rows={4}
-              placeholder="例如：请先站内消息联系，再约时间"
+            <section className="space-y-3" aria-label="基础信息">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">基础信息</h2>
+              <FormInput
+                label="服务标题"
+                value={serviceTitle}
+                onChange={setServiceTitle}
+                placeholder="例如：周末家电小修互助"
+                maxLength={30}
+              />
+              <FormTextarea
+                label="服务说明"
+                value={serviceDesc}
+                onChange={setServiceDesc}
+                placeholder="介绍可提供的帮助内容与限制条件"
+              />
+              <FormInput
+                label="可服务时间"
+                value={serviceTime}
+                onChange={setServiceTime}
+                placeholder="例如：工作日 19:00 后 / 周末全天"
+              />
+              <FormInput
+                label="区域"
+                value={serviceArea}
+                onChange={setServiceArea}
+                placeholder="例如：锦绣里及周边 2km"
+              />
+              <FormTextarea
+                label="联系方式说明"
+                value={contactNote}
+                onChange={setContactNote}
+                rows={4}
+                placeholder="例如：请先站内消息联系，再约时间"
+              />
+            </section>
+
+            <SupportModeSelector
+              primaryMode="community"
+              modules={tradeModules}
+              onChange={setTradeModules}
             />
           </>
         )}

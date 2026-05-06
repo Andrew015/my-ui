@@ -34,14 +34,40 @@ export type Item = {
   expectedSwapType?: string;
   imageHeight?: "sm" | "md" | "lg";
   distanceKm?: number;
+  /** 地图页气泡位置 X 百分比（0-100） */
+  mapX?: number;
+  /** 地图页气泡位置 Y 百分比（0-100） */
+  mapY?: number;
+  /** 附加：也支持租用 */
+  supportRent?: boolean;
+  supportRentPrice?: number;
+  supportRentDeposit?: number;
+  supportRentDuration?: string;
+  supportRentDescription?: string;
+  /** 附加：也支持置换 */
+  supportSwap?: boolean;
+  supportExchangeWish?: string;
+  supportExchangeType?: string;
+  supportExchangeDescription?: string;
+  /** 附加：也支持赠送 */
+  supportGive?: boolean;
+  giveCondition?: string;
+  giveTarget?: string;
+  giveDescription?: string;
   publishedAt?: string;
   title: string;
   priceLabel: string;
   location: string;
   owner: string;
+  ownerId?: string;
   tag: string;
   desc: string;
 };
+
+export const currentUser = {
+  id: "user-current",
+  nickname: "我",
+} as const;
 
 export type HomeEntry = {
   href: string;
@@ -53,26 +79,26 @@ export type HomeEntry = {
 export const homeEntries: HomeEntry[] = [
   {
     href: "/idle",
-    title: "淘闲置",
-    desc: "附近好物，轻松淘",
+    title: "淘宝物",
+    desc: "1-3公里的低价私藏家",
     accent: "from-[#F97316] to-[#ea580c]",
   },
   {
     href: "/rent",
-    title: "短租用",
-    desc: "短期借用，不必囤货",
+    title: "租闲余",
+    desc: "万物皆可租 秒赚小零钱",
     accent: "from-[#FACC15] to-[#FDBA74]",
   },
   {
     href: "/swap",
-    title: "来置换",
-    desc: "以物换物，各取所需",
+    title: "趣置换",
+    desc: "不止于物物置换的有趣新体验",
     accent: "from-[#FDBA74] to-[#F97316]",
   },
   {
     href: "/community",
-    title: "邻里公益",
-    desc: "免费赠送、互助服务",
+    title: "邻公益",
+    desc: "点滴互助 有邻真好",
     accent: "from-[#fdba74] to-[#92400E]",
   },
 ];
@@ -128,7 +154,17 @@ export const items: Item[] = [
     priceLabel: "￥120",
     location: "锦绣里",
     owner: "小周",
+    ownerId: currentUser.id,
     tag: "可验机",
+    supportRent: true,
+    supportRentPrice: 12,
+    supportRentDeposit: 80,
+    supportRentDuration: "3天起租",
+    supportRentDescription: "周末可取还，长租可议价",
+    supportSwap: true,
+    supportExchangeWish: "平板或墨水屏阅读器",
+    supportExchangeType: "数码设备",
+    supportExchangeDescription: "成色相近即可，当面验机",
     detailTags: ["可验机", "95新", "当面交易"],
     sellerCredit: "信用优秀 · 实名认证",
     desc: "功能正常，附带半盒彩色墨盒。",
@@ -221,6 +257,7 @@ export const items: Item[] = [
     priceLabel: "￥18/天",
     location: "云栖苑",
     owner: "王师傅",
+    ownerId: currentUser.id,
     tag: "押金100",
     desc: "家装临时使用，支持按天结算。",
   },
@@ -235,6 +272,10 @@ export const items: Item[] = [
     location: "荷风里",
     owner: "阿宁",
     tag: "周末可约",
+    supportSwap: true,
+    supportExchangeWish: "便携音箱或麦克风",
+    supportExchangeType: "影音周边",
+    supportExchangeDescription: "",
     desc: "适合聚会观影，附 HDMI 线。",
   },
   {
@@ -302,7 +343,13 @@ export const items: Item[] = [
     priceLabel: "置换",
     location: "青禾里",
     owner: "小麦",
+    ownerId: currentUser.id,
     tag: "九新",
+    supportRent: true,
+    supportRentPrice: 8,
+    supportRentDeposit: 40,
+    supportRentDuration: "1天起",
+    supportRentDescription: "同城可取",
     desc: "耳机功能正常，电池健康，希望换办公外设。",
   },
   {
@@ -326,7 +373,12 @@ export const items: Item[] = [
     priceLabel: "免费",
     location: "长虹里",
     owner: "陈叔",
+    ownerId: currentUser.id,
     tag: "先到先得",
+    supportSwap: true,
+    supportExchangeWish: "多肉花盆或营养土",
+    supportExchangeType: "园艺相关",
+    supportExchangeDescription: "随缘互换即可",
     desc: "搬家清理，适合阳台种植。",
   },
   {
@@ -346,6 +398,7 @@ export const items: Item[] = [
     priceLabel: "互助",
     location: "江畔里",
     owner: "老林",
+    ownerId: currentUser.id,
     tag: "周三晚",
     desc: "可协助排查小家电故障，互帮互助。",
   },
@@ -361,6 +414,26 @@ export const items: Item[] = [
   },
 ];
 
+const CURRENT_USER_ITEM_IDS = new Set([
+  "idle-printer-002",
+  "rent-drill-101",
+  "swap-headset-203",
+  "give-pot-301",
+  "help-repair-401",
+]);
+
+const OTHER_OWNER_IDS = ["user-001", "user-002", "user-003"] as const;
+let ownerCursor = 0;
+for (const item of items) {
+  if (item.ownerId) continue;
+  if (CURRENT_USER_ITEM_IDS.has(item.id)) {
+    item.ownerId = currentUser.id;
+  } else {
+    item.ownerId = OTHER_OWNER_IDS[ownerCursor % OTHER_OWNER_IDS.length];
+    ownerCursor += 1;
+  }
+}
+
 export const publishTypes = [
   { key: "sell", title: "出售闲置", desc: "转卖闲置物品，快速回血", href: "/publish/sell" },
   { key: "rent", title: "出租闲置", desc: "短期出租，物尽其用", href: "/publish/rent" },
@@ -369,6 +442,7 @@ export const publishTypes = [
 ] as const;
 
 export type PublishCategory = "数码" | "家居" | "服饰" | "母婴" | "图书" | "运动";
+export const MAX_PUBLISH_PRICE = 1000;
 export type PublishType = "sell" | "rent" | "swap" | "community-give" | "community-help";
 export type SellTag = "95新" | "可验机" | "面交" | "可小刀";
 export type RentTag = "可面交" | "可议价";
@@ -389,6 +463,19 @@ export type PublishedPost = {
   serviceTime?: string;
   serviceArea?: string;
   contactNote?: string;
+  supportRent?: boolean;
+  supportRentPrice?: number;
+  supportRentDeposit?: number;
+  supportRentDuration?: string;
+  supportRentDescription?: string;
+  supportSwap?: boolean;
+  supportExchangeWish?: string;
+  supportExchangeType?: string;
+  supportExchangeDescription?: string;
+  supportGive?: boolean;
+  giveCondition?: string;
+  giveTarget?: string;
+  giveDescription?: string;
   category: PublishCategory;
   tags: string[];
   location: string;
@@ -443,6 +530,19 @@ export type MyPublishedItem = {
   communityMode?: "give" | "help";
   tags: string[];
   contactNote?: string;
+  supportRent?: boolean;
+  supportRentPrice?: number;
+  supportRentDeposit?: number;
+  supportRentDuration?: string;
+  supportRentDescription?: string;
+  supportSwap?: boolean;
+  supportExchangeWish?: string;
+  supportExchangeType?: string;
+  supportExchangeDescription?: string;
+  supportGive?: boolean;
+  giveCondition?: string;
+  giveTarget?: string;
+  giveDescription?: string;
   serviceTime?: string;
   serviceArea?: string;
   images: string[];
@@ -462,6 +562,10 @@ const myPublishedSeed: MyPublishedItem[] = [
     category: "数码",
     price: 120,
     tags: ["95新", "可验机", "面交"],
+    supportSwap: true,
+    supportExchangeWish: "平板或阅读器",
+    supportExchangeType: "数码",
+    supportExchangeDescription: "",
     images: ["seed-sell-1", "seed-sell-2"],
     location: "锦绣里 · 距离 3.8km",
     status: "active",
@@ -477,6 +581,14 @@ const myPublishedSeed: MyPublishedItem[] = [
     deposit: 100,
     rentTerm: "按天",
     tags: ["可面交", "可议价"],
+    supportSwap: true,
+    supportExchangeWish: "小型家用工具",
+    supportExchangeType: "家居工具",
+    supportExchangeDescription: "",
+    supportGive: true,
+    giveCondition: "仅需上门自取",
+    giveTarget: "同小区邻居优先",
+    giveDescription: "",
     images: ["seed-rent-1"],
     location: "云栖苑 · 距离 2.8km",
     status: "active",
@@ -490,6 +602,11 @@ const myPublishedSeed: MyPublishedItem[] = [
     category: "数码",
     exchangeWish: "键盘或鼠标",
     tags: ["同城", "面交"],
+    supportRent: true,
+    supportRentPrice: 6,
+    supportRentDeposit: 50,
+    supportRentDuration: "2天起",
+    supportRentDescription: "",
     images: ["seed-swap-1"],
     location: "青禾里 · 距离 0.8km",
     status: "offline",
@@ -565,6 +682,20 @@ export function mapPublishedItemToFormState(item: MyPublishedItem) {
     serviceArea: item.serviceArea ?? "",
     contactNote: item.contactNote ?? "",
   };
+}
+
+export const supportModeLabelMap = {
+  rent: "可租",
+  swap: "可换",
+  give: "可赠送",
+} as const;
+
+export function getItemSupportTagLabels(item: Item): string[] {
+  const labels: string[] = [];
+  if (item.supportRent) labels.push(supportModeLabelMap.rent);
+  if (item.supportSwap) labels.push(supportModeLabelMap.swap);
+  if (item.supportGive) labels.push(supportModeLabelMap.give);
+  return labels;
 }
 
 export const channelMap: Record<Channel, string> = {

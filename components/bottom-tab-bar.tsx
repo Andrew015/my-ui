@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { getUnreadChatCount, getUnreadNotificationCount, useNotificationStore } from "@/data/notification-store";
 
 const tabs = [
   { href: "/", label: "首页", icon: HomeIcon },
@@ -13,6 +14,9 @@ const tabs = [
 
 export function BottomTabBar() {
   const pathname = usePathname();
+  useNotificationStore();
+  const hasMessageUnread =
+    getUnreadChatCount() > 0 || getUnreadNotificationCount() > 0;
 
   return (
     <nav
@@ -34,7 +38,12 @@ export function BottomTabBar() {
                 active ? "text-brand" : "text-stone-400 hover:text-stone-600"
               }`}
             >
-              <Icon active={active} />
+              <span className="relative">
+                <Icon active={active} />
+                {href === "/messages" && hasMessageUnread ? (
+                  <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-red-500" />
+                ) : null}
+              </span>
               <span className="text-[11px] font-medium">{label}</span>
             </Link>
           );

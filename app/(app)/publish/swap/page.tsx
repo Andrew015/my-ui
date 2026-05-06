@@ -9,12 +9,15 @@ import { ImageUploader } from "@/components/image-uploader";
 import { PageHeader } from "@/components/page-header";
 import { PublishToast } from "@/components/publish-toast";
 import { SubmitFooter } from "@/components/submit-footer";
+import { SupportModeSelector } from "@/components/support-mode-selector";
 import { TagSelector } from "@/components/tag-selector";
 import {
-  createPublishedMockItem,
-  publishCategories,
-  swapTagOptions,
-} from "@/data/mock";
+  modulesToFormState,
+  publishedAdditionalTradePayload,
+  type TradeModule,
+  validateAdditionalTradeForm,
+} from "@/data/additional-trade";
+import { createPublishedMockItem, publishCategories, swapTagOptions } from "@/data/mock";
 
 export default function PublishSwapPage() {
   const router = useRouter();
@@ -24,6 +27,7 @@ export default function PublishSwapPage() {
   const [category, setCategory] = useState<(typeof publishCategories)[number]>("数码");
   const [tags, setTags] = useState<string[]>(["同城"]);
   const [images, setImages] = useState<string[]>([]);
+  const [tradeModules, setTradeModules] = useState<TradeModule[]>([]);
   const [location] = useState("锦绣里 · 距离 3.8km");
   const [toast, setToast] = useState<string | null>(null);
 
@@ -45,6 +49,14 @@ export default function PublishSwapPage() {
       setTimeout(() => setToast(null), 1500);
       return;
     }
+
+    const tradeCheck = validateAdditionalTradeForm(modulesToFormState(tradeModules));
+    if (!tradeCheck.ok) {
+      setToast(tradeCheck.message);
+      setTimeout(() => setToast(null), 1800);
+      return;
+    }
+
     const payload = {
       type: "swap" as const,
       title: title.trim(),
@@ -52,6 +64,7 @@ export default function PublishSwapPage() {
       expectedSwap: expectedSwap.trim(),
       category,
       tags,
+      ...publishedAdditionalTradePayload(modulesToFormState(tradeModules)),
       location,
       images,
     };
@@ -67,32 +80,42 @@ export default function PublishSwapPage() {
       <PageHeader title="发布置换" backHref="/publish" />
 
       <div className="space-y-3 px-4 py-4 pb-28">
-        <ImageUploader images={images} onAddImage={onAddImage} />
-        <FormInput
-          label="标题"
-          value={title}
-          onChange={setTitle}
-          placeholder="给你的置换信息起个标题"
-          maxLength={30}
-        />
-        <FormTextarea
-          label="描述"
-          value={desc}
-          onChange={setDesc}
-          placeholder="描述一下成色、功能、置换偏好…"
-        />
-        <CategorySelector
-          categories={publishCategories}
-          selectedCategory={category}
-          onSelect={(value) => setCategory(value as (typeof publishCategories)[number])}
-        />
-        <FormInput
-          label="想换什么"
-          value={expectedSwap}
-          onChange={setExpectedSwap}
-          placeholder="例如：想换机械键盘或显示器支架"
-        />
-        <TagSelector tags={swapTagOptions} selectedTags={tags} onToggle={onToggleTag} />
+        <section className="space-y-3" aria-label="基础信息">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">基础信息</h2>
+          <ImageUploader images={images} onAddImage={onAddImage} />
+          <FormInput
+            label="标题"
+            value={title}
+            onChange={setTitle}
+            placeholder="给你的置换信息起个标题"
+            maxLength={30}
+          />
+          <FormTextarea
+            label="描述"
+            value={desc}
+            onChange={setDesc}
+            placeholder="描述一下成色、功能、置换偏好…"
+          />
+          <CategorySelector
+            categories={publishCategories}
+            selectedCategory={category}
+            onSelect={(value) => setCategory(value as (typeof publishCategories)[number])}
+          />
+          <FormInput
+            label="想换什么"
+            value={expectedSwap}
+            onChange={setExpectedSwap}
+            placeholder="例如：想换机械键盘或显示器支架"
+          />
+        </section>
+
+        <section aria-label="标签">
+          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">标签</h2>
+          <TagSelector tags={swapTagOptions} selectedTags={tags} onToggle={onToggleTag} />
+        </section>
+
+        <SupportModeSelector primaryMode="swap" modules={tradeModules} onChange={setTradeModules} />
+
         <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90">
           <h2 className="text-sm font-semibold text-stone-800">位置</h2>
           <p className="mt-2 text-sm text-stone-600">{location}</p>

@@ -6,14 +6,16 @@ type PriceInputProps = {
   onChange: (value: string) => void;
   placeholder?: string;
   prefix?: string;
+  hint?: string;
 };
 
 export function PriceInput({
   label,
   value,
   onChange,
-  placeholder = "请输入价格",
+  placeholder = "请输入价格（≤1000元）",
   prefix = "￥",
+  hint = "仅支持 1000 元以内",
 }: PriceInputProps) {
   return (
     <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90">
@@ -22,12 +24,13 @@ export function PriceInput({
         <span className="text-base font-semibold text-orange-500">{prefix}</span>
         <input
           value={value}
-          inputMode="decimal"
+          inputMode="numeric"
           onChange={(event) => onChange(event.target.value)}
           placeholder={placeholder}
           className="min-w-0 flex-1 bg-transparent text-sm text-stone-700 outline-none placeholder:text-stone-400"
         />
       </div>
+      <p className="mt-2 text-xs text-stone-400">{hint}</p>
     </section>
   );
 }

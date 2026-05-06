@@ -1,17 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { ChatRoom } from "@/components/chat-room";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { currentUser } from "@/data/mock";
 import { getMarketplaceItemById, useMarketplaceStore } from "@/data/marketplace-store";
+import { markChatRead } from "@/data/notification-store";
+import { getTransactionById, getTransactions } from "@/data/transaction-store";
 
 export default function MessageDetailPage() {
   const params = useParams<{ id: string }>();
+  const sp = useSearchParams();
   const id = String(params?.id ?? "");
   const marketplace = useMarketplaceStore();
   const item = getMarketplaceItemById(id);
+  const txId = sp.get("transactionId");
+  const roleParam = sp.get("role");
+  const txFromId = txId ? getTransactionById(txId) : undefined;
+  const txFromItem = getTransactions().find((t) => t.itemId === id);
+  const tx = txFromId ?? txFromItem;
+
+  const role: "buyer" | "seller" =
+    roleParam === "seller" || roleParam === "buyer"
+      ? roleParam
+      : tx
+        ? tx.sellerId === currentUser.id
+          ? "seller"
+          : "buyer"
+        : "buyer";
+
+  useEffect(() => {
+    if (!tx?.id) return;
+    markChatRead(tx.id);
+  }, [tx?.id]);
 
   if (!item) {
     return (
@@ -73,7 +97,7 @@ export default function MessageDetailPage() {
         </Link>
       </div>
 
-      <ChatRoom ownerName={item.owner} itemStatus={item.status} />
+      <ChatRoom ownerName={item.owner} itemStatus={item.status} role={role} transactionStatus={tx?.status} />
     </div>
   );
 }

@@ -10,6 +10,14 @@ import { ImageUploader } from "@/components/image-uploader";
 import { PageHeader } from "@/components/page-header";
 import { PublishToast } from "@/components/publish-toast";
 import { SubmitFooter } from "@/components/submit-footer";
+import { SupportModeSelector } from "@/components/support-mode-selector";
+import {
+  additionalTradePatchForSave,
+  modulesToFormState,
+  tradeModulesFromPublished,
+  type TradeModule,
+  validateAdditionalTradeForm,
+} from "@/data/additional-trade";
 import {
   getPublishedItemById,
   mapPublishedItemToFormState,
@@ -38,6 +46,7 @@ export default function EditCommunityPage() {
   const [category, setCategory] = useState<(typeof publishCategories)[number]>("家居");
   const [pickupMethod, setPickupMethod] = useState<"自取" | "联系">("自取");
   const [images, setImages] = useState<string[]>([]);
+  const [tradeModules, setTradeModules] = useState<TradeModule[]>([]);
   const [location, setLocation] = useState("");
 
   const [serviceTitle, setServiceTitle] = useState("");
@@ -65,6 +74,7 @@ export default function EditCommunityPage() {
         setDesc(mapped.description);
         setCategory(mapped.category as (typeof publishCategories)[number]);
         setPickupMethod((mapped.tags[0] as "自取" | "联系") || "自取");
+        setTradeModules(tradeModulesFromPublished(current));
         setImages(mapped.images);
         setLocation(mapped.location);
       } else {
@@ -73,6 +83,7 @@ export default function EditCommunityPage() {
         setServiceTime(mapped.serviceTime);
         setServiceArea(mapped.serviceArea);
         setContactNote(mapped.contactNote);
+        setTradeModules(tradeModulesFromPublished(current));
       }
       setLoading(false);
     }, 140);
@@ -84,6 +95,15 @@ export default function EditCommunityPage() {
   };
 
   const onSubmit = () => {
+    const tradeCheck = validateAdditionalTradeForm(modulesToFormState(tradeModules));
+    if (!tradeCheck.ok) {
+      setToast(tradeCheck.message);
+      setTimeout(() => setToast(null), 1800);
+      return;
+    }
+
+    const tradePatch = additionalTradePatchForSave(modulesToFormState(tradeModules));
+
     if (tab === "give") {
       if (!title.trim()) {
         setToast("请先填写标题");
@@ -97,6 +117,7 @@ export default function EditCommunityPage() {
         category,
         communityMode: "give",
         tags: [pickupMethod],
+        ...tradePatch,
         images,
         location,
       };
@@ -114,6 +135,7 @@ export default function EditCommunityPage() {
         description: serviceDesc.trim(),
         communityMode: "help",
         tags: ["互助服务"],
+        ...tradePatch,
         serviceTime: serviceTime.trim(),
         serviceArea: serviceArea.trim(),
         contactNote: contactNote.trim(),
@@ -209,6 +231,11 @@ export default function EditCommunityPage() {
               selectedCategory={pickupMethod}
               onSelect={(value) => setPickupMethod(value as "自取" | "联系")}
             />
+            <SupportModeSelector
+              primaryMode="community"
+              modules={tradeModules}
+              onChange={setTradeModules}
+            />
             <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90">
               <h2 className="text-sm font-semibold text-stone-800">位置</h2>
               <p className="mt-2 text-sm text-stone-600">{location}</p>
@@ -247,6 +274,11 @@ export default function EditCommunityPage() {
               onChange={setContactNote}
               rows={4}
               placeholder="例如：请先站内消息联系，再约时间"
+            />
+            <SupportModeSelector
+              primaryMode="community"
+              modules={tradeModules}
+              onChange={setTradeModules}
             />
           </>
         )}

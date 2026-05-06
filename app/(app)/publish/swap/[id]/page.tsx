@@ -10,7 +10,15 @@ import { ImageUploader } from "@/components/image-uploader";
 import { PageHeader } from "@/components/page-header";
 import { PublishToast } from "@/components/publish-toast";
 import { SubmitFooter } from "@/components/submit-footer";
+import { SupportModeSelector } from "@/components/support-mode-selector";
 import { TagSelector } from "@/components/tag-selector";
+import {
+  additionalTradePatchForSave,
+  modulesToFormState,
+  tradeModulesFromPublished,
+  type TradeModule,
+  validateAdditionalTradeForm,
+} from "@/data/additional-trade";
 import {
   getPublishedItemById,
   mapPublishedItemToFormState,
@@ -35,6 +43,7 @@ export default function EditSwapPage() {
   const [exchangeWish, setExchangeWish] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [images, setImages] = useState<string[]>([]);
+  const [tradeModules, setTradeModules] = useState<TradeModule[]>([]);
   const [location, setLocation] = useState("");
 
   useEffect(() => {
@@ -53,6 +62,7 @@ export default function EditSwapPage() {
       setCategory(mapped.category as (typeof publishCategories)[number]);
       setExchangeWish(mapped.exchangeWish);
       setTags(mapped.tags);
+      setTradeModules(tradeModulesFromPublished(current));
       setImages(mapped.images);
       setLocation(mapped.location);
       setLoading(false);
@@ -79,12 +89,20 @@ export default function EditSwapPage() {
       return;
     }
 
+    const tradeCheck = validateAdditionalTradeForm(modulesToFormState(tradeModules));
+    if (!tradeCheck.ok) {
+      setToast(tradeCheck.message);
+      setTimeout(() => setToast(null), 1800);
+      return;
+    }
+
     const patch: Partial<MyPublishedItem> = {
       title: title.trim(),
       description: desc.trim(),
       category,
       exchangeWish: exchangeWish.trim(),
       tags,
+      ...additionalTradePatchForSave(modulesToFormState(tradeModules)),
       images,
       location,
     };
@@ -128,7 +146,9 @@ export default function EditSwapPage() {
       <PageHeader title="编辑置换" backHref="/me/published" />
 
       <div className="space-y-3 px-4 py-4 pb-28">
-        <ImageUploader images={images} onAddImage={onAddImage} />
+        <section className="space-y-3" aria-label="基础信息">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-400">基础信息</h2>
+          <ImageUploader images={images} onAddImage={onAddImage} />
         <FormInput
           label="标题"
           value={title}
@@ -153,7 +173,12 @@ export default function EditSwapPage() {
           onChange={setExchangeWish}
           placeholder="例如：想换机械键盘或显示器支架"
         />
-        <TagSelector tags={swapTagOptions} selectedTags={tags} onToggle={onToggleTag} />
+        </section>
+        <section aria-label="标签">
+          <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">标签</h2>
+          <TagSelector tags={swapTagOptions} selectedTags={tags} onToggle={onToggleTag} />
+        </section>
+        <SupportModeSelector primaryMode="swap" modules={tradeModules} onChange={setTradeModules} />
         <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-orange-100/90">
           <h2 className="text-sm font-semibold text-stone-800">位置</h2>
           <p className="mt-2 text-sm text-stone-600">{location}</p>

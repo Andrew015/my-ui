@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/page-header";
 export default function MePage() {
   const rows = [
     { label: "我的发布", href: "/me/published" },
+    { label: "我的交易", href: "/me/orders" },
     { label: "我的收藏", href: "/me/favorites" },
     { label: "浏览历史", href: "/me/history" },
     { label: "消息中心", href: "/messages" },

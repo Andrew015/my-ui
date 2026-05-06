@@ -1,0 +1,45 @@
+"use client";
+
+type MapSearchBarProps = {
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+};
+
+export function MapSearchBar({ value, onChange, onSubmit }: MapSearchBarProps) {
+  return (
+    <form
+      className="rounded-2xl bg-white px-3 py-2.5 shadow-sm ring-1 ring-orange-100/90"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSubmit();
+      }}
+    >
+      <div className="flex items-center gap-2">
+        <svg
+          className="h-4 w-4 shrink-0 text-stone-400"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          aria-hidden
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.2-3.2" />
+        </svg>
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="搜索小区、街道、地标"
+          className="min-w-0 flex-1 bg-transparent text-sm text-stone-800 placeholder:text-stone-400 outline-none"
+        />
+        <button
+          type="submit"
+          className="rounded-lg bg-orange-50 px-2 py-1 text-xs font-medium text-orange-600"
+        >
+          搜索
+        </button>
+      </div>
+    </form>
+  );
+}

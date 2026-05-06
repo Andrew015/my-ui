@@ -3,10 +3,16 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { FavoriteButton } from "@/components/favorite-button";
+import { HomeBannerCarousel } from "@/components/home-banner-carousel";
 import { HomeSearchBar } from "@/components/home-search-bar";
+import { LocationEntry } from "@/components/location-entry";
 import { SectionTitle } from "@/components/section-title";
 import { homeEntries } from "@/data/mock";
-import { getActiveMarketplaceItemsByChannel, useMarketplaceStore } from "@/data/marketplace-store";
+import {
+  getActiveMarketplaceItemsByChannel,
+  getCurrentLocation,
+  useMarketplaceStore,
+} from "@/data/marketplace-store";
 
 export default function HomePage() {
   const marketplace = useMarketplaceStore();
@@ -30,22 +36,20 @@ export default function HomePage() {
   return (
     <div className="px-4 pb-10 pt-1">
       <header className="pt-3">
-        <p className="text-xs font-medium uppercase tracking-widest text-emphasis/90">邻里流转</p>
+        <LocationEntry locationText={getCurrentLocation()} />
+        <p className="mt-4 text-xs font-medium uppercase tracking-widest text-emphasis/90">Rich closes to you&me</p>
         <h1 className="mt-1.5 text-2xl font-semibold leading-tight tracking-tight text-stone-800">
-          让闲置流动起来
+          远亲不如近邻
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-stone-500">
-          同小区好价、短租救急、公益互助，一天一个样。
+          邻里之间 共喜发财
         </p>
       </header>
 
       <HomeSearchBar />
+      <HomeBannerCarousel />
 
       <section className="mt-7" aria-label="主入口">
-        <div className="mb-3 flex items-end justify-between gap-2">
-          <h2 className="text-base font-semibold text-emphasis">主入口</h2>
-          <span className="text-xs text-stone-400">先逛再换，更放心</span>
-        </div>
         <div className="grid grid-cols-2 gap-3">
           <Link
             href={idleEntry.href}
@@ -92,21 +96,6 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-
-      <div className="mt-7 flex gap-3">
-        <Link
-          href="/publish"
-          className="flex flex-1 items-center justify-center rounded-2xl bg-brand py-3.5 text-sm font-semibold text-brand-foreground shadow-sm transition hover:bg-brand-hover"
-        >
-          发布闲置 / 出租
-        </Link>
-        <Link
-          href="/idle"
-          className="flex flex-1 items-center justify-center rounded-2xl bg-white py-3.5 text-sm font-semibold text-emphasis ring-1 ring-orange-100/90 transition hover:bg-orange-50/80"
-        >
-          浏览全部在售
-        </Link>
-      </div>
 
       <section className="mt-10 rounded-3xl bg-white/90 p-4 shadow-sm ring-1 ring-orange-100/80">
         <SectionTitle title="附近在售" subtitle="邻里刚上新" />

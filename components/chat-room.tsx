@@ -5,6 +5,8 @@ import { useState } from "react";
 type ChatRoomProps = {
   ownerName: string;
   itemStatus?: "active" | "offline" | "done";
+  role?: "buyer" | "seller";
+  transactionStatus?: "pending" | "confirmed" | "processing" | "completed" | "cancelled" | "rejected";
 };
 
 type ChatMessage = {
@@ -38,26 +40,48 @@ function isSameDay(a: Date, b: Date) {
   );
 }
 
-export function ChatRoom({ ownerName, itemStatus = "active" }: ChatRoomProps) {
+export function ChatRoom({
+  ownerName,
+  itemStatus = "active",
+  role = "buyer",
+  transactionStatus,
+}: ChatRoomProps) {
   const initialTimeA = new Date();
   initialTimeA.setHours(14, 32, 0, 0);
   const initialTimeB = new Date(initialTimeA);
   initialTimeB.setMinutes(initialTimeA.getMinutes() + 1);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "1",
-      role: "other",
-      text: "你好，物品还在的，可以先看看详情～",
-      sentAt: initialTimeA.toISOString(),
-    },
-    {
-      id: "2",
-      role: "me",
-      text: "好的，我想确认一下是否支持当面验货。",
-      sentAt: initialTimeB.toISOString(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>(
+    role === "seller"
+      ? [
+          {
+            id: "1",
+            role: "other",
+            text: "你好，我想购买这个商品，今天方便当面交易吗？",
+            sentAt: initialTimeA.toISOString(),
+          },
+          {
+            id: "2",
+            role: "me",
+            text: "可以的，商品还在，可以约锦绣里小区门口交接。",
+            sentAt: initialTimeB.toISOString(),
+          },
+        ]
+      : [
+          {
+            id: "1",
+            role: "other",
+            text: "你好，物品还在的，可以先看看详情～",
+            sentAt: initialTimeA.toISOString(),
+          },
+          {
+            id: "2",
+            role: "me",
+            text: "好的，我想确认一下是否支持当面验货。",
+            sentAt: initialTimeB.toISOString(),
+          },
+        ],
+  );
 
   const handleSend = () => {
     if (itemStatus !== "active") return;
@@ -83,6 +107,13 @@ export function ChatRoom({ ownerName, itemStatus = "active" }: ChatRoomProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col px-4 pb-4">
       <div className="flex-1 space-y-3 overflow-y-auto py-4">
+        {transactionStatus === "confirmed" || transactionStatus === "processing" ? (
+          <div className="text-center">
+            <span className="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs text-orange-700 ring-1 ring-orange-200/80">
+              {transactionStatus === "confirmed" ? "对方已确认" : "交易进行中"}
+            </span>
+          </div>
+        ) : null}
         {messages.map((message, index) => (
           <div key={message.id} className={message.role === "me" ? "text-right" : "text-left"}>
             {(() => {
@@ -126,7 +157,7 @@ export function ChatRoom({ ownerName, itemStatus = "active" }: ChatRoomProps) {
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder="说点什么，和对方沟通…"
+          placeholder={role === "seller" ? "回复买家，确认时间或交易方式..." : "说点什么，和对方沟通..."}
           className="min-w-0 flex-1 bg-transparent px-1 text-sm text-stone-700 placeholder:text-stone-400 outline-none"
           disabled={itemStatus !== "active"}
           onKeyDown={(event) => {
